@@ -1,14 +1,13 @@
 import puppeter from "puppeteer";
-import chalk from "chalk";
 
-type User = {
+export type User = {
   name: string;
   password: string;
 };
 
-type Token = string;
+export type Token = string;
 
-type Attendance = {
+export type Attendance = {
   code: string;
   title: string;
   quarter: string;
@@ -18,7 +17,7 @@ type Attendance = {
   records: AttendanceStatus[];
 };
 
-type AttendanceStatus = {
+export type AttendanceStatus = {
   date: string;
   status: string;
 };
@@ -35,7 +34,7 @@ const getToken = (text: string): Token => {
   return matched[1];
 };
 
-async function get(u: User) {
+async function getAttendance(u: User): Promise<Attendance[]> {
   const browser = await puppeter.launch({
     headless: true,
     args: ["--no-sandbox"]
@@ -89,42 +88,10 @@ async function get(u: User) {
       }
     );
   });
-  viewAll(data);
   await browser.close();
-}
-
-function viewAll(data: Attendance[]) {
-  data.map(row => view(row));
-}
-function view(a: Attendance) {
-  console.log(chalk.white.bold(`> ${a.title} ${a.code}`));
-  let recordLog = [chalk.yellow(a.rate)];
-  for (let record of a.records) {
-    switch (record.status) {
-      case "出席": {
-        recordLog.push(chalk.black.bgGreen(record.date));
-        break;
-      }
-      case "修正出席": {
-        recordLog.push(chalk.black.bgCyan(record.date));
-        break;
-      }
-      case "遅刻": {
-        recordLog.push(chalk.black.bgRed(record.date));
-        break;
-      }
-      case "欠席": {
-        recordLog.push(chalk.black.bgRed(record.date));
-        break;
-      }
-      default: {
-        recordLog.push(chalk.black.bgGreen(record.date));
-      }
-    }
-  }
-  console.log(recordLog.join(" "));
+  return data;
 }
 
 export default {
-  get
+  getAttendance
 };
