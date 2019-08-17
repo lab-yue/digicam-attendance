@@ -29,7 +29,7 @@ export function renderRow(a: Attendance) {
         break;
       }
       default: {
-        recordLog.push(chalk.black.bgGreen(record.date));
+        recordLog.push(chalk.white(record.date));
       }
     }
   }
