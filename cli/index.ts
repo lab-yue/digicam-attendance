@@ -11,11 +11,13 @@ import { render } from "./view";
   }
   const argv = minimist(process.argv.slice(2));
   let { q } = argv;
+  console.time("api");
 
   let data = await api.getAttendance({
     name: DC_NAME,
     password: DC_PASSWORD
   });
+  console.timeEnd("api");
 
   if (typeof q === "number") {
     q = q.toString();
@@ -24,6 +26,7 @@ import { render } from "./view";
   if (typeof q === "string") {
     data = data.filter(row => row.quarter.includes(q));
   }
-
+  console.time("render");
   render(data);
+  console.timeEnd("render");
 })();
