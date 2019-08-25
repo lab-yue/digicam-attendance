@@ -41,6 +41,37 @@ async function getAttendance(u: User): Promise<Attendance[]> {
   });
 
   const page = await browser.newPage();
+  await page.setRequestInterception(true);
+
+  const blockresourceTypes = [
+    //"document",
+    "stylesheet",
+    "image",
+    "media",
+    "font",
+    //"script",
+    "texttrack",
+    "xhr",
+    "fetch",
+    "eventsource",
+    "websocket",
+    "manifest",
+    "other"
+  ];
+
+  const blockSuffixes = ["jpg", ".jpeg", ".png", ".gif", ".css"];
+
+  page.on("request", request => {
+    const blockByResource = blockresourceTypes.includes(request.resourceType());
+    const blockBySuffix = blockSuffixes.some(suffix =>
+      request.url().endsWith(suffix)
+    );
+    if (blockByResource || blockBySuffix) {
+      request.abort();
+    } else {
+      request.continue();
+    }
+  });
 
   await page.goto(urls.login);
 
